@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>RSVP Reader</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css?v=2">
+</head>
+<body>
+    <!-- Экран библиотеки -->
+    <div id="library-screen" class="screen active">
+        <header class="header">
+            <h1>RSVP Reader</h1>
+            <button id="settings-btn" class="icon-btn" aria-label="Настройки">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </header>
+
+        <main class="library-content">
+            <div id="book-list" class="book-list">
+                <!-- Книги будут добавлены динамически -->
+            </div>
+
+            <div id="empty-library" class="empty-state">
+                <p>Библиотека пуста</p>
+                <p class="hint">Нажмите + чтобы добавить книгу</p>
+            </div>
+        </main>
+
+        <input type="file" id="file-input" accept=".epub" hidden>
+        <button id="add-book-btn" class="fab" aria-label="Добавить книгу">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Экран ридера -->
+    <div id="reader-screen" class="screen">
+        <header class="reader-header">
+            <button id="back-btn" class="icon-btn" aria-label="Назад">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </button>
+            <span id="book-title" class="book-title">Название книги</span>
+            <button id="toc-btn" class="icon-btn" aria-label="Оглавление">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                </svg>
+            </button>
+            <button id="reader-settings-btn" class="icon-btn" aria-label="Настройки">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </header>
+
+        <main class="reader-content">
+            <div id="word-display" class="word-display">
+                <span class="word-left"></span><span class="word-focus"></span><span class="word-right"></span>
+            </div>
+            <div class="focus-line"></div>
+        </main>
+
+        <footer class="reader-controls">
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-text" class="progress-text">0%</span>
+            </div>
+
+            <div class="control-row main-controls">
+                <button id="rewind-btn" class="control-btn" aria-label="Назад">
+                    <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path fill="currentColor" d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+                    </svg>
+                </button>
+                <button id="play-btn" class="control-btn play-btn" aria-label="Старт">
+                    <svg class="play-icon" viewBox="0 0 24 24" width="40" height="40">
+                        <path fill="currentColor" d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="pause-icon" viewBox="0 0 24 24" width="40" height="40" style="display:none">
+                        <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                </button>
+                <button id="forward-btn" class="control-btn" aria-label="Вперёд">
+                    <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path fill="currentColor" d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="control-row speed-controls">
+                <button id="slower-btn" class="control-btn small" aria-label="Медленнее">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M19 13H5v-2h14v2z"/>
+                    </svg>
+                </button>
+                <span id="speed-display" class="speed-display">250 WPM</span>
+                <button id="faster-btn" class="control-btn small" aria-label="Быстрее">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модалка оглавления -->
+    <div id="toc-modal" class="modal">
+        <div class="modal-content toc-modal-content">
+            <h2>Оглавление</h2>
+            <div id="toc-list" class="toc-list">
+                <!-- Главы будут добавлены динамически -->
+            </div>
+            <button id="close-toc-btn" class="btn">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- Модалка настроек -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2>Настройки</h2>
+
+            <div class="setting-item">
+                <label for="font-size-slider">Размер шрифта</label>
+                <input type="range" id="font-size-slider" min="24" max="72" value="48">
+                <span id="font-size-value">48px</span>
+            </div>
+
+            <div class="setting-item">
+                <label for="default-speed-slider">Скорость по умолчанию</label>
+                <input type="range" id="default-speed-slider" min="10" max="800" step="10" value="250">
+                <span id="default-speed-value">250 WPM</span>
+            </div>
+
+            <button id="close-settings-btn" class="btn">Закрыть</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <script src="js/storage.js?v=2"></script>
+    <script src="js/epub-parser.js?v=2"></script>
+    <script src="js/library.js?v=2"></script>
+    <script src="js/reader.js?v=2"></script>
+    <script src="js/app.js?v=2"></script>
+</body>
+</html>
