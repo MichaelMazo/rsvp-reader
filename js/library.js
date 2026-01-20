@@ -52,6 +52,11 @@ const Library = {
                 totalWords: 0
             });
 
+            // Upload to cloud if signed in
+            if (FirebaseSync.currentUser) {
+                await FirebaseSync.uploadBook(book);
+            }
+
             // Re-render
             await this.renderBooks();
 
@@ -141,6 +146,10 @@ const Library = {
     async confirmDeleteBook(bookId) {
         if (confirm('Delete this book?')) {
             await Storage.deleteBook(bookId);
+            // Delete from cloud if signed in
+            if (FirebaseSync.currentUser) {
+                await FirebaseSync.deleteBook(bookId);
+            }
             await this.renderBooks();
         }
     }

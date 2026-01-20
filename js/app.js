@@ -21,14 +21,64 @@ const App = {
         // Initialize modules
         Library.init();
         Reader.init();
+        FirebaseSync.init();
 
         // Setup settings modal
         this.initSettings();
+
+        // Setup Firebase auth UI
+        this.initAuth();
 
         // Register service worker for PWA
         this.registerServiceWorker();
 
         console.log('RSVP Reader initialized');
+    },
+
+    /**
+     * Initialize Firebase auth UI
+     */
+    initAuth() {
+        const signInBtn = document.getElementById('sign-in-btn');
+        const userInfo = document.getElementById('user-info');
+        const signOutBtn = document.getElementById('sign-out-btn');
+        const syncNowBtn = document.getElementById('sync-now-btn');
+        const syncSection = document.getElementById('sync-section');
+
+        // Sign in
+        signInBtn.addEventListener('click', () => {
+            FirebaseSync.signIn();
+        });
+
+        // Click on user info opens settings
+        userInfo.addEventListener('click', () => {
+            this.settingsModal.classList.add('active');
+        });
+
+        // Sign out
+        signOutBtn.addEventListener('click', () => {
+            FirebaseSync.signOut();
+            this.settingsModal.classList.remove('active');
+        });
+
+        // Sync now
+        syncNowBtn.addEventListener('click', async () => {
+            syncNowBtn.textContent = 'Синхронизация...';
+            syncNowBtn.disabled = true;
+            await FirebaseSync.syncAllToCloud();
+            await FirebaseSync.syncFromCloud();
+            syncNowBtn.textContent = 'Синхронизировать';
+            syncNowBtn.disabled = false;
+        });
+
+        // Show/hide sync section based on auth state
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                syncSection.style.display = 'flex';
+            } else {
+                syncSection.style.display = 'none';
+            }
+        });
     },
 
     /**

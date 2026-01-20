@@ -538,3 +538,64 @@ input[type="range"]::-webkit-slider-thumb {
     color: var(--text-secondary);
     padding: 20px;
 }
+
+/* Header actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* User info */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-size: 14px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sync section */
+.sync-section {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sync-section label {
+    margin-bottom: 4px;
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+}
+
+.btn-secondary:active {
+    background: var(--bg-primary);
+}
+
+.btn-danger {
+    background: #c0392b;
+}
+
+.btn-danger:active {
+    background: #e74c3c;
+}

@@ -11,6 +11,7 @@ const Reader = {
     wasPlayingBeforeSeek: false,
     intervalId: null,
     resumeTimeoutId: null,
+    syncTimeoutId: null,
     wpm: 250,
 
     // DOM elements
@@ -337,11 +338,22 @@ const Reader = {
     },
 
     /**
-     * Save current position
+     * Save current position (with debounced cloud sync)
      */
     savePosition() {
         if (this.currentBook) {
             Storage.saveReadingPosition(this.currentBook.id, this.currentIndex);
+
+            // Debounced cloud sync (every 5 seconds max)
+            if (this.syncTimeoutId) {
+                clearTimeout(this.syncTimeoutId);
+            }
+            this.syncTimeoutId = setTimeout(() => {
+                if (FirebaseSync.currentUser) {
+                    FirebaseSync.updateBookPosition(this.currentBook.id, this.currentIndex);
+                }
+                this.syncTimeoutId = null;
+            }, 5000);
         }
     },
 
@@ -350,7 +362,11 @@ const Reader = {
      */
     goBack() {
         this.pause();
-        this.savePosition();
+        // Force immediate cloud sync on exit
+        if (this.currentBook && FirebaseSync.currentUser) {
+            FirebaseSync.updateBookPosition(this.currentBook.id, this.currentIndex);
+        }
+        Storage.saveReadingPosition(this.currentBook.id, this.currentIndex);
         App.showLibrary();
     },
 

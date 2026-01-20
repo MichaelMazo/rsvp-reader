@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rsvp-reader-v2';
+const CACHE_NAME = 'rsvp-reader-v3';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -8,6 +8,8 @@ const urlsToCache = [
     '/js/library.js',
     '/js/reader.js',
     '/js/epub-parser.js',
+    '/js/firebase-config.js',
+    '/js/firebase-sync.js',
     '/manifest.json'
 ];
 
