@@ -155,6 +155,18 @@
                 <span id="default-speed-value">250 WPM</span>
             </div>
 
+            <div class="setting-item">
+                <label for="long-word-threshold-slider">Порог длинного слова</label>
+                <input type="range" id="long-word-threshold-slider" min="4" max="15" value="8">
+                <span id="long-word-threshold-value">8 букв</span>
+            </div>
+
+            <div class="setting-item">
+                <label for="long-word-extra-slider">Доп. время для длинных слов</label>
+                <input type="range" id="long-word-extra-slider" min="0" max="100" step="5" value="30">
+                <span id="long-word-extra-value">+30%</span>
+            </div>
+
             <div id="sync-section" class="setting-item sync-section" style="display:none">
                 <label>Синхронизация</label>
                 <button id="sync-now-btn" class="btn btn-secondary">Синхронизировать</button>

@@ -255,8 +255,9 @@ html, body {
 .word-left {
     color: var(--text-primary);
     text-align: right;
-    min-width: 45vw;
+    width: 45vw;
     display: inline-block;
+    overflow: hidden;
 }
 
 .word-focus {
@@ -265,13 +266,15 @@ html, body {
     display: inline-block;
     width: 0.6em;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .word-right {
     color: var(--text-primary);
     text-align: left;
-    min-width: 45vw;
+    width: 45vw;
     display: inline-block;
+    overflow: hidden;
 }
 
 .focus-line {

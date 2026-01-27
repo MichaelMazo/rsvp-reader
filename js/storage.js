@@ -186,7 +186,9 @@ const Storage = {
     getSettings() {
         const defaults = {
             wpm: 250,
-            fontSize: 48
+            fontSize: 48,
+            longWordThreshold: 8,    // Words >= this length get extra time
+            longWordExtraTime: 30    // Extra time percentage for long words
         };
         try {
             const stored = JSON.parse(localStorage.getItem('settings'));
@@ -230,5 +232,33 @@ const Storage = {
      */
     saveFontSize(fontSize) {
         this.saveSettings({ fontSize });
+    },
+
+    /**
+     * Get long word threshold setting
+     */
+    getLongWordThreshold() {
+        return this.getSettings().longWordThreshold;
+    },
+
+    /**
+     * Save long word threshold setting
+     */
+    saveLongWordThreshold(threshold) {
+        this.saveSettings({ longWordThreshold: threshold });
+    },
+
+    /**
+     * Get long word extra time setting (percentage)
+     */
+    getLongWordExtraTime() {
+        return this.getSettings().longWordExtraTime;
+    },
+
+    /**
+     * Save long word extra time setting
+     */
+    saveLongWordExtraTime(percent) {
+        this.saveSettings({ longWordExtraTime: percent });
     }
 };

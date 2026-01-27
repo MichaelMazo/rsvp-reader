@@ -89,6 +89,10 @@ const App = {
         const fontSizeValue = document.getElementById('font-size-value');
         const speedSlider = document.getElementById('default-speed-slider');
         const speedValue = document.getElementById('default-speed-value');
+        const thresholdSlider = document.getElementById('long-word-threshold-slider');
+        const thresholdValue = document.getElementById('long-word-threshold-value');
+        const extraTimeSlider = document.getElementById('long-word-extra-slider');
+        const extraTimeValue = document.getElementById('long-word-extra-value');
         const closeBtn = document.getElementById('close-settings-btn');
 
         // Load current settings
@@ -97,6 +101,10 @@ const App = {
         fontSizeValue.textContent = `${settings.fontSize}px`;
         speedSlider.value = settings.wpm;
         speedValue.textContent = `${settings.wpm} WPM`;
+        thresholdSlider.value = settings.longWordThreshold;
+        thresholdValue.textContent = `${settings.longWordThreshold} букв`;
+        extraTimeSlider.value = settings.longWordExtraTime;
+        extraTimeValue.textContent = `+${settings.longWordExtraTime}%`;
 
         // Font size change
         fontSizeSlider.addEventListener('input', () => {
@@ -113,6 +121,20 @@ const App = {
             Storage.saveWPM(wpm);
             Reader.wpm = wpm;
             Reader.updateSpeedDisplay();
+        });
+
+        // Long word threshold change
+        thresholdSlider.addEventListener('input', () => {
+            const threshold = parseInt(thresholdSlider.value);
+            thresholdValue.textContent = `${threshold} букв`;
+            Reader.updateLongWordSettings(threshold, Reader.longWordExtraTime);
+        });
+
+        // Long word extra time change
+        extraTimeSlider.addEventListener('input', () => {
+            const extraTime = parseInt(extraTimeSlider.value);
+            extraTimeValue.textContent = `+${extraTime}%`;
+            Reader.updateLongWordSettings(Reader.longWordThreshold, extraTime);
         });
 
         // Open settings

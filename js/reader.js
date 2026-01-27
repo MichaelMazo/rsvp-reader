@@ -9,10 +9,12 @@ const Reader = {
     currentIndex: 0,
     isPlaying: false,
     wasPlayingBeforeSeek: false,
-    intervalId: null,
+    timeoutId: null,
     resumeTimeoutId: null,
     syncTimeoutId: null,
     wpm: 250,
+    longWordThreshold: 8,
+    longWordExtraTime: 30,
 
     // DOM elements
     screenEl: null,
@@ -45,6 +47,8 @@ const Reader = {
 
         // Load settings
         this.wpm = Storage.getWPM();
+        this.longWordThreshold = Storage.getLongWordThreshold();
+        this.longWordExtraTime = Storage.getLongWordExtraTime();
         this.updateFontSize();
 
         // Event listeners
@@ -154,6 +158,39 @@ const Reader = {
     },
 
     /**
+     * Calculate display time for a word based on its length
+     */
+    getWordDisplayTime(word) {
+        const baseInterval = Math.round(60000 / this.wpm);
+
+        // Get clean word length (without punctuation)
+        const cleanWord = word.replace(/[^\p{L}\p{N}]/gu, '');
+        const wordLength = cleanWord.length;
+
+        // If word is longer than threshold, add extra time
+        if (wordLength >= this.longWordThreshold) {
+            const extraMultiplier = 1 + (this.longWordExtraTime / 100);
+            return Math.round(baseInterval * extraMultiplier);
+        }
+
+        return baseInterval;
+    },
+
+    /**
+     * Schedule the next word with appropriate delay
+     */
+    scheduleNextWord() {
+        if (!this.isPlaying || this.currentIndex >= this.words.length) {
+            return;
+        }
+
+        const currentWord = this.words[this.currentIndex];
+        const displayTime = this.getWordDisplayTime(currentWord);
+
+        this.timeoutId = setTimeout(() => this.nextWord(), displayTime);
+    },
+
+    /**
      * Start playing
      */
     play() {
@@ -165,8 +202,8 @@ const Reader = {
         this.playIconEl.style.display = 'none';
         this.pauseIconEl.style.display = 'block';
 
-        const interval = Math.round(60000 / this.wpm);
-        this.intervalId = setInterval(() => this.nextWord(), interval);
+        // Use setTimeout for dynamic word timing
+        this.scheduleNextWord();
     },
 
     /**
@@ -178,9 +215,9 @@ const Reader = {
         this.playIconEl.style.display = 'block';
         this.pauseIconEl.style.display = 'none';
 
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
         }
 
         if (this.resumeTimeoutId) {
@@ -206,6 +243,9 @@ const Reader = {
 
         this.displayCurrentWord();
         this.updateProgress();
+
+        // Schedule next word with dynamic timing
+        this.scheduleNextWord();
     },
 
     /**
@@ -237,8 +277,8 @@ const Reader = {
 
         // Pause playback
         if (this.isPlaying) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
         }
 
         // Clear previous resume timeout
@@ -256,41 +296,32 @@ const Reader = {
         this.resumeTimeoutId = setTimeout(() => {
             if (this.wasPlayingBeforeSeek) {
                 this.wasPlayingBeforeSeek = false;
-                const interval = Math.round(60000 / this.wpm);
-                this.intervalId = setInterval(() => this.nextWord(), interval);
+                this.scheduleNextWord();
             }
             this.resumeTimeoutId = null;
         }, 500);
     },
 
     /**
-     * Get speed step based on current WPM
+     * Get speed step (always 10)
      */
     getSpeedStep() {
-        return this.wpm <= 100 ? 10 : 50;
+        return 10;
     },
 
     /**
-     * Decrease speed
+     * Decrease speed by 10 WPM
      */
     slower() {
-        const step = this.wpm <= 100 ? 10 : (this.wpm === 150 ? 50 : 50);
-        let newWpm = this.wpm - step;
-        // Snap to 100 when going down from 150
-        if (this.wpm > 100 && newWpm < 100) newWpm = 100;
-        this.wpm = Math.max(10, newWpm);
+        this.wpm = Math.max(10, this.wpm - 10);
         this.updateSpeed();
     },
 
     /**
-     * Increase speed
+     * Increase speed by 10 WPM
      */
     faster() {
-        const step = this.wpm < 100 ? 10 : 50;
-        let newWpm = this.wpm + step;
-        // Snap to 150 when going up from 100
-        if (this.wpm === 100) newWpm = 150;
-        this.wpm = Math.min(1000, newWpm);
+        this.wpm = Math.min(1000, this.wpm + 10);
         this.updateSpeed();
     },
 
@@ -302,10 +333,19 @@ const Reader = {
         Storage.saveWPM(this.wpm);
 
         if (this.isPlaying) {
-            clearInterval(this.intervalId);
-            const interval = Math.round(60000 / this.wpm);
-            this.intervalId = setInterval(() => this.nextWord(), interval);
+            clearTimeout(this.timeoutId);
+            this.scheduleNextWord();
         }
+    },
+
+    /**
+     * Update long word settings
+     */
+    updateLongWordSettings(threshold, extraTime) {
+        this.longWordThreshold = threshold;
+        this.longWordExtraTime = extraTime;
+        Storage.saveLongWordThreshold(threshold);
+        Storage.saveLongWordExtraTime(extraTime);
     },
 
     /**

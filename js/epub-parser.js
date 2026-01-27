@@ -128,15 +128,27 @@ const EpubParser = {
     },
 
     /**
-     * Split text into words, preserving punctuation attached to words
+     * Split text into words, separating by punctuation where words are glued
      */
     splitIntoWords(text) {
-        // Normalize whitespace and split
-        const words = text
-            .replace(/\s+/g, ' ')
-            .trim()
+        // Normalize whitespace
+        let normalized = text.replace(/\s+/g, ' ').trim();
+
+        // Split "word.Word" or "word,Word" patterns - punctuation followed by letter
+        normalized = normalized.replace(/([.,:;!?])(?=[\p{L}])/gu, '$1 ');
+
+        // Split em-dash and en-dash followed by letters
+        normalized = normalized.replace(/([—–])(?=[\p{L}])/gu, '$1 ');
+
+        // Split by spaces and filter
+        const words = normalized
             .split(' ')
-            .filter(word => word.length > 0);
+            .filter(word => {
+                if (word.length === 0) return false;
+                // Remove strings that are only punctuation
+                if (/^[.,:;!?—–…]+$/.test(word)) return false;
+                return true;
+            });
 
         return words;
     },
