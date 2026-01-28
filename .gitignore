@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Test artifacts
+test/screenshots/
+*.epub
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
