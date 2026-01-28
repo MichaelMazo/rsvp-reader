@@ -66,5 +66,12 @@ self.addEventListener('fetch', event => {
                     return response;
                 });
             })
+            .then(response => {
+                // If navigation request got a 404, serve the cached index instead
+                if (response && response.status === 404 && event.request.mode === 'navigate') {
+                    return caches.match('./index.html') || response;
+                }
+                return response;
+            })
     );
 });
