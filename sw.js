@@ -1,16 +1,16 @@
-const CACHE_NAME = 'rsvp-reader-v3';
+const CACHE_NAME = 'rsvp-reader-v4';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/styles.css',
-    '/js/app.js',
-    '/js/storage.js',
-    '/js/library.js',
-    '/js/reader.js',
-    '/js/epub-parser.js',
-    '/js/firebase-config.js',
-    '/js/firebase-sync.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './css/styles.css',
+    './js/app.js',
+    './js/storage.js',
+    './js/library.js',
+    './js/reader.js',
+    './js/epub-parser.js',
+    './js/firebase-config.js',
+    './js/firebase-sync.js',
+    './manifest.json'
 ];
 
 // Install
