@@ -255,7 +255,7 @@ html, body {
 .word-left {
     color: var(--text-primary);
     text-align: right;
-    width: 45vw;
+    width: 35vw;
     display: inline-block;
     overflow: hidden;
 }
@@ -272,7 +272,7 @@ html, body {
 .word-right {
     color: var(--text-primary);
     text-align: left;
-    width: 45vw;
+    width: 55vw;
     display: inline-block;
     overflow: hidden;
 }
@@ -280,7 +280,7 @@ html, body {
 .focus-line {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 40%;
     transform: translate(-50%, -50%);
     width: 2px;
     height: 80px;

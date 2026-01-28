@@ -1,16 +1,16 @@
-const CACHE_NAME = 'rsvp-reader-v3';
+const CACHE_NAME = 'rsvp-reader-v4';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/css/styles.css',
-    '/js/app.js',
-    '/js/storage.js',
-    '/js/library.js',
-    '/js/reader.js',
-    '/js/epub-parser.js',
-    '/js/firebase-config.js',
-    '/js/firebase-sync.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './css/styles.css',
+    './js/app.js',
+    './js/storage.js',
+    './js/library.js',
+    './js/reader.js',
+    './js/epub-parser.js',
+    './js/firebase-config.js',
+    './js/firebase-sync.js',
+    './manifest.json'
 ];
 
 // Install
@@ -65,6 +65,13 @@ self.addEventListener('fetch', event => {
                         .then(cache => cache.put(event.request, responseToCache));
                     return response;
                 });
+            })
+            .then(response => {
+                // If navigation request got a 404, serve the cached index instead
+                if (response && response.status === 404 && event.request.mode === 'navigate') {
+                    return caches.match('./index.html') || response;
+                }
+                return response;
             })
     );
 });
