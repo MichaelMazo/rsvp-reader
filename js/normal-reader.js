@@ -211,17 +211,16 @@ const NormalReader = {
     },
 
     _goToWordInCurrentChapter(wordIndex) {
+        // Try exact match first
         const span = this.pagesEl.querySelector(`span[data-word-index="${wordIndex}"]`);
         if (span) {
             const page = Math.floor(span.offsetLeft / this.pageWidth);
             this.goToPage(page);
             return;
         }
-        // Find nearest span
-        const ch = this.chaptersHTML[this.currentChapterIndex];
-        if (!ch) return;
-        // Binary-ish: try nearby indices
-        for (let delta = 1; delta < 50; delta++) {
+
+        // Try nearby indices (word counts can differ slightly between parser modes)
+        for (let delta = 1; delta < 100; delta++) {
             const s = this.pagesEl.querySelector(`span[data-word-index="${wordIndex + delta}"]`) ||
                       this.pagesEl.querySelector(`span[data-word-index="${wordIndex - delta}"]`);
             if (s) {
@@ -230,26 +229,32 @@ const NormalReader = {
                 return;
             }
         }
-        this.goToPage(0);
+
+        // Fallback: proportional position within chapter
+        const ch = this.chaptersHTML[this.currentChapterIndex];
+        if (ch && this.totalPagesInChapter > 1) {
+            const chapterWordCount = ch.endWordIndex - ch.startWordIndex + 1;
+            const posInChapter = wordIndex - ch.startWordIndex;
+            const frac = Math.max(0, Math.min(1, posInChapter / chapterWordCount));
+            const page = Math.floor(frac * this.totalPagesInChapter);
+            this.goToPage(page);
+        } else {
+            this.goToPage(0);
+        }
     },
 
     getVisibleWordIndex() {
+        // Try to find a word span via elementFromPoint
         const containerRect = this.containerEl.getBoundingClientRect();
-        const sampleX = containerRect.left + 30;
-        const samplePoints = [
-            containerRect.top + 30,
-            containerRect.top + 60,
-            containerRect.top + 90,
-            containerRect.top + 120,
-        ];
-        for (const y of samplePoints) {
+        const sampleX = containerRect.left + 40;
+        for (let y = containerRect.top + 20; y < containerRect.bottom - 20; y += 30) {
             const el = document.elementFromPoint(sampleX, y);
             if (el) {
                 const wordSpan = el.closest('span[data-word-index]');
                 if (wordSpan) return parseInt(wordSpan.dataset.wordIndex);
             }
         }
-        // Fallback: estimate from chapter position
+        // Fallback: proportional estimate from chapter position
         const ch = this.chaptersHTML[this.currentChapterIndex];
         if (ch) {
             const frac = this.currentPageInChapter / Math.max(1, this.totalPagesInChapter);
@@ -321,15 +326,8 @@ const NormalReader = {
     },
 
     onContainerClick(e) {
-        const selection = window.getSelection();
-        if (selection && selection.toString().length > 0) return;
-        if (e.target.closest('a')) return;
-
-        const rect = this.containerEl.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const third = rect.width / 3;
-        if (x < third) this.prevPage();
-        else if (x > third * 2) this.nextPage();
+        // Don't turn pages on click — interferes with text selection.
+        // Use keyboard arrows or swipe instead.
     },
 
     // --- Selection → RSVP ---
