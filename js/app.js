@@ -211,10 +211,8 @@ const App = {
      */
     initModeToggle() {
         document.getElementById('mode-toggle-btn').addEventListener('click', () => {
-            if (this.currentMode === 'normal') {
-                const wordIndex = NormalReader.getVisibleWordIndex();
-                this.switchMode('rsvp', wordIndex);
-            } else {
+            // Only works from RSVP → Normal. Normal → RSVP is via word selection.
+            if (this.currentMode === 'rsvp') {
                 this.switchMode('normal', Reader.currentIndex);
             }
         });
@@ -228,16 +226,14 @@ const App = {
 
         const rsvpContent = document.getElementById('rsvp-content');
         const rsvpControls = document.getElementById('rsvp-controls');
-        const modeIconBook = document.getElementById('mode-icon-book');
-        const modeIconRsvp = document.getElementById('mode-icon-rsvp');
+        const modeToggleBtn = document.getElementById('mode-toggle-btn');
 
         if (mode === 'rsvp') {
             Reader.pause();
             NormalReader.hide();
             rsvpContent.style.display = 'flex';
             rsvpControls.style.display = 'block';
-            modeIconBook.style.display = 'block';
-            modeIconRsvp.style.display = 'none';
+            modeToggleBtn.style.display = 'flex'; // Show: can go back to normal
 
             // Set RSVP position
             if (wordIndex !== undefined) {
@@ -250,8 +246,7 @@ const App = {
             rsvpContent.style.display = 'none';
             rsvpControls.style.display = 'none';
             NormalReader.show();
-            modeIconBook.style.display = 'none';
-            modeIconRsvp.style.display = 'block';
+            modeToggleBtn.style.display = 'none'; // Hide: use word selection instead
 
             // Navigate to word position and highlight it
             if (wordIndex !== undefined) {
@@ -551,7 +546,7 @@ const App = {
             NormalReader.loadBookData(book, result.words, result.chapters, result.chaptersHTML);
 
             // Open in default mode (normal)
-            this.currentMode = 'normal';
+            this.currentMode = '_init'; // Force switchMode to run
             this.switchMode('normal', Storage.getReadingPosition(bookId));
 
         } catch (error) {
