@@ -613,6 +613,10 @@ input[type="range"]::-webkit-slider-thumb {
     flex-direction: column;
     position: relative;
     overflow: hidden;
+}
+
+.normal-reader-content,
+.normal-reader-content * {
     user-select: text;
     -webkit-user-select: text;
 }
@@ -621,7 +625,6 @@ input[type="range"]::-webkit-slider-thumb {
     flex: 1;
     overflow: hidden;
     position: relative;
-    contain: layout style paint;
 }
 
 .normal-reader-pages {

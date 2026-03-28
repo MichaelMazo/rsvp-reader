@@ -394,10 +394,10 @@ const NormalReader = {
 
     show() {
         this.contentEl.style.display = 'flex';
+        // Only recalculate layout, don't navigate — caller handles navigation
         if (this.chaptersHTML.length > 0) {
             requestAnimationFrame(() => {
                 this.calculateChapterPages();
-                this.goToPage(this.currentPageInChapter);
             });
         }
     },

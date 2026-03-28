@@ -253,9 +253,10 @@ const App = {
             modeIconBook.style.display = 'none';
             modeIconRsvp.style.display = 'block';
 
-            // Navigate to word position
+            // Navigate to word position — goToWordIndex handles chapter rendering internally
             if (wordIndex !== undefined) {
-                requestAnimationFrame(() => {
+                // Small delay to let show() finish layout
+                setTimeout(() => {
                     NormalReader.goToWordIndex(wordIndex);
                 });
             }
