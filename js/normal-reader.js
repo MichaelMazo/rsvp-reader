@@ -353,6 +353,23 @@ const NormalReader = {
         this.floatingRsvpBtn.dataset.wordIndex = wordSpan.dataset.wordIndex;
     },
 
+    highlightWord(wordIndex) {
+        this.clearHighlight();
+        // Defer to ensure the chapter is rendered
+        setTimeout(() => {
+            const span = this.pagesEl.querySelector(`span[data-word-index="${wordIndex}"]`);
+            if (span) {
+                span.classList.add('highlighted-word');
+                span.addEventListener('click', () => this.clearHighlight(), { once: true });
+            }
+        }, 100);
+    },
+
+    clearHighlight() {
+        const el = this.pagesEl.querySelector('.highlighted-word');
+        if (el) el.classList.remove('highlighted-word');
+    },
+
     startRsvpFromSelection() {
         const wordIndex = parseInt(this.floatingRsvpBtn.dataset.wordIndex);
         this.floatingRsvpBtn.style.display = 'none';

@@ -733,8 +733,12 @@ input[type="range"]::-webkit-slider-thumb {
     break-before: auto;
 }
 
-.normal-reader-pages span[data-word-index] {
-    /* No special styling — invisible annotation */
+.normal-reader-pages span.highlighted-word {
+    background: var(--accent);
+    color: white;
+    border-radius: 3px;
+    padding: 1px 3px;
+    cursor: pointer;
 }
 
 .page-indicator {

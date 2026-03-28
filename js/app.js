@@ -253,11 +253,11 @@ const App = {
             modeIconBook.style.display = 'none';
             modeIconRsvp.style.display = 'block';
 
-            // Navigate to word position — goToWordIndex handles chapter rendering internally
+            // Navigate to word position and highlight it
             if (wordIndex !== undefined) {
-                // Small delay to let show() finish layout
                 setTimeout(() => {
                     NormalReader.goToWordIndex(wordIndex);
+                    NormalReader.highlightWord(wordIndex);
                 });
             }
         }
