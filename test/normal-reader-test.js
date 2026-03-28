@@ -149,20 +149,26 @@ async function runTests() {
         assert(paginationCheck.totalPages > 1, `Has ${paginationCheck.totalPages} pages`);
         assert(paginationCheck.pageWidth > 0, `Page width: ${paginationCheck.pageWidth}px`);
 
-        // Navigate pages
+        // Navigate pages — first chapter may be 1 page (cover), so nextPage goes to ch2
+        const pageBefore = await page.evaluate(() => NormalReader.currentPage);
         await page.evaluate(() => NormalReader.nextPage());
-        const afterNext = await page.evaluate(() => NormalReader.currentPage);
-        assert(afterNext === 1, `After nextPage: page ${afterNext}`);
+        await new Promise(r => setTimeout(r, 300));
+        const pageAfterNext = await page.evaluate(() => NormalReader.currentPage);
+        assert(pageAfterNext > pageBefore, `After nextPage: globalPage ${pageBefore} -> ${pageAfterNext}`);
         await page.screenshot({ path: `${SCREENSHOTS_DIR}/04-page2.png` });
 
         await page.evaluate(() => NormalReader.prevPage());
-        const afterPrev = await page.evaluate(() => NormalReader.currentPage);
-        assert(afterPrev === 0, `After prevPage: page ${afterPrev}`);
+        await new Promise(r => setTimeout(r, 800)); // Chapter re-render is async
+        const pageAfterPrev = await page.evaluate(() => NormalReader.currentPage);
+        assert(pageAfterPrev <= pageBefore, `After prevPage: globalPage ${pageAfterNext} -> ${pageAfterPrev}`);
 
         // 7. Mode switching
         console.log('\n7. Testing mode switching...');
-        // Go to page 5 first
-        await page.evaluate(() => NormalReader.goToPage(5));
+        // Navigate forward several pages to get a non-zero word index
+        for (let i = 0; i < 5; i++) {
+            await page.evaluate(() => NormalReader.nextPage());
+            await new Promise(r => setTimeout(r, 300));
+        }
         const wordAtPage5 = await page.evaluate(() => NormalReader.getVisibleWordIndex());
         assert(wordAtPage5 > 0, `Word index at page 5: ${wordAtPage5}`);
 
