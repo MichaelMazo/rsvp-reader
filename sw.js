@@ -39,41 +39,38 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch
+// Fetch — network-first for app files, cache-fallback for offline
 self.addEventListener('fetch', event => {
-    // Skip non-GET requests and external URLs
     if (event.request.method !== 'GET') return;
 
     const url = new URL(event.request.url);
 
-    // Skip CDN requests (let them go to network)
-    if (url.hostname !== location.hostname) {
-        return;
-    }
+    // Skip CDN requests
+    if (url.hostname !== location.hostname) return;
 
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                if (response) {
+                if (!response || response.status !== 200) {
                     return response;
                 }
-                return fetch(event.request).then(response => {
-                    // Don't cache non-successful responses
-                    if (!response || response.status !== 200) {
-                        return response;
-                    }
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then(cache => cache.put(event.request, responseToCache));
-                    return response;
-                });
-            })
-            .then(response => {
-                // If navigation request got a 404, serve the cached index instead
-                if (response && response.status === 404 && event.request.mode === 'navigate') {
-                    return caches.match('./index.html') || response;
-                }
+                // Update cache with fresh response
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME)
+                    .then(cache => cache.put(event.request, responseToCache));
                 return response;
+            })
+            .catch(() => {
+                // Network failed — serve from cache (offline support)
+                return caches.match(event.request)
+                    .then(response => {
+                        if (response) return response;
+                        // If navigation request, serve cached index
+                        if (event.request.mode === 'navigate') {
+                            return caches.match('./index.html');
+                        }
+                        return new Response('Offline', { status: 503 });
+                    });
             })
     );
 });
