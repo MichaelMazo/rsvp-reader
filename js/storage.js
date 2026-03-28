@@ -260,5 +260,52 @@ const Storage = {
      */
     saveLongWordExtraTime(percent) {
         this.saveSettings({ longWordExtraTime: percent });
+    },
+
+    // ==================== BOOKMARKS ====================
+
+    /**
+     * Get all bookmarks for a book
+     */
+    getBookmarks(bookId) {
+        try {
+            const all = JSON.parse(localStorage.getItem('bookmarks')) || {};
+            return all[bookId] || [];
+        } catch {
+            return [];
+        }
+    },
+
+    /**
+     * Add a bookmark for a book
+     */
+    addBookmark(bookId, bookmark) {
+        const all = this._getAllBookmarks();
+        if (!all[bookId]) all[bookId] = [];
+        all[bookId].push(bookmark);
+        localStorage.setItem('bookmarks', JSON.stringify(all));
+    },
+
+    /**
+     * Remove a bookmark by id
+     */
+    removeBookmark(bookId, bookmarkId) {
+        const all = this._getAllBookmarks();
+        if (all[bookId]) {
+            all[bookId] = all[bookId].filter(b => b.id !== bookmarkId);
+            if (all[bookId].length === 0) delete all[bookId];
+            localStorage.setItem('bookmarks', JSON.stringify(all));
+        }
+    },
+
+    /**
+     * Get all bookmarks (for sync)
+     */
+    _getAllBookmarks() {
+        try {
+            return JSON.parse(localStorage.getItem('bookmarks')) || {};
+        } catch {
+            return {};
+        }
     }
 };

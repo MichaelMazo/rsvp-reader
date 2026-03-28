@@ -113,6 +113,17 @@ const FirebaseSync = {
                     } else if (localUpdated > cloudUpdated) {
                         await this.updateBookPosition(doc.id, localPosition);
                     }
+
+                    // Merge bookmarks
+                    if (cloudBook.bookmarks && cloudBook.bookmarks.length > 0) {
+                        const localBookmarks = Storage.getBookmarks(doc.id);
+                        const localIds = new Set(localBookmarks.map(b => b.id));
+                        for (const cb of cloudBook.bookmarks) {
+                            if (!localIds.has(cb.id)) {
+                                Storage.addBookmark(doc.id, cb);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -189,17 +200,25 @@ const FirebaseSync = {
     },
 
     /**
-     * Update book position in cloud
+     * Update book position and bookmarks in cloud
      */
     async updateBookPosition(bookId, position) {
         if (!this.currentUser || !this.isOnline) return;
 
         try {
             const booksRef = this.getBooksRef();
-            await booksRef.doc(bookId).update({
+            const updateData = {
                 currentPosition: position,
                 updatedAt: firebase.firestore.Timestamp.now()
-            });
+            };
+
+            // Also sync bookmarks
+            const bookmarks = Storage.getBookmarks(bookId);
+            if (bookmarks.length > 0) {
+                updateData.bookmarks = bookmarks;
+            }
+
+            await booksRef.doc(bookId).update(updateData);
         } catch (error) {
             console.error('Update position error:', error);
         }

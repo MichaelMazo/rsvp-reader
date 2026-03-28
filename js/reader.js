@@ -79,7 +79,25 @@ const Reader = {
     },
 
     /**
-     * Load a book for reading
+     * Load pre-parsed book data (called from App, avoids double parsing)
+     */
+    loadBookData(book, words, chapters) {
+        this.currentBook = book;
+        this.words = words;
+        this.chapters = chapters;
+
+        // Restore position
+        this.currentIndex = Storage.getReadingPosition(book.id);
+        if (this.currentIndex >= this.words.length) {
+            this.currentIndex = 0;
+        }
+
+        this.displayCurrentWord();
+        this.updateProgress();
+    },
+
+    /**
+     * Load a book for reading (legacy, used by old flow)
      */
     async loadBook(bookId) {
         const book = await Storage.getBook(bookId);
@@ -401,12 +419,6 @@ const Reader = {
      * Go back to library
      */
     goBack() {
-        this.pause();
-        // Force immediate cloud sync on exit
-        if (this.currentBook && FirebaseSync.currentUser) {
-            FirebaseSync.updateBookPosition(this.currentBook.id, this.currentIndex);
-        }
-        Storage.saveReadingPosition(this.currentBook.id, this.currentIndex);
         App.showLibrary();
     },
 
@@ -415,6 +427,10 @@ const Reader = {
      */
     handleKeyboard(event) {
         if (!this.screenEl.classList.contains('active')) return;
+        // Don't handle keys when in normal reading mode
+        if (document.getElementById('rsvp-content').style.display === 'none') return;
+        // Don't handle if a modal is open
+        if (document.querySelector('.modal.active')) return;
 
         switch (event.code) {
             case 'Space':

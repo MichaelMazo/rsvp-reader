@@ -7,6 +7,8 @@ const urlsToCache = [
     './js/storage.js',
     './js/library.js',
     './js/reader.js',
+    './js/normal-reader.js',
+    './js/search.js',
     './js/epub-parser.js',
     './js/firebase-config.js',
     './js/firebase-sync.js',

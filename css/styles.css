@@ -14,6 +14,8 @@
     --accent-light: #ff6b6b;
     --success: #4ecca3;
     --font-size-word: 48px;
+    --normal-font-size: 18px;
+    --normal-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html, body {
@@ -601,4 +603,314 @@ input[type="range"]::-webkit-slider-thumb {
 
 .btn-danger:active {
     background: #e74c3c;
+}
+
+/* ==================== Normal Reader ==================== */
+
+.normal-reader-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.normal-reader-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.normal-reader-pages {
+    height: 100%;
+    column-fill: auto;
+    transition: transform 0.3s ease;
+    font-family: var(--normal-font-family);
+    font-size: var(--normal-font-size);
+    line-height: 1.7;
+    color: var(--text-primary);
+    /* column-width and column-gap set dynamically by JS */
+}
+
+/* Padding applied to block elements within columns for per-page margins */
+.normal-reader-pages p,
+.normal-reader-pages div,
+.normal-reader-pages h1,
+.normal-reader-pages h2,
+.normal-reader-pages h3,
+.normal-reader-pages h4,
+.normal-reader-pages h5,
+.normal-reader-pages h6,
+.normal-reader-pages blockquote,
+.normal-reader-pages ul,
+.normal-reader-pages ol,
+.normal-reader-pages pre,
+.normal-reader-pages figure,
+.normal-reader-pages table {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.normal-reader-pages p {
+    margin-bottom: 1em;
+    text-indent: 1.5em;
+}
+
+.normal-reader-pages p:first-child {
+    text-indent: 0;
+}
+
+.normal-reader-pages h1,
+.normal-reader-pages h2,
+.normal-reader-pages h3,
+.normal-reader-pages h4,
+.normal-reader-pages h5,
+.normal-reader-pages h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.normal-reader-pages h1 { font-size: 1.6em; }
+.normal-reader-pages h2 { font-size: 1.4em; }
+.normal-reader-pages h3 { font-size: 1.2em; }
+.normal-reader-pages h4 { font-size: 1.1em; }
+
+.normal-reader-pages strong,
+.normal-reader-pages b {
+    font-weight: 600;
+}
+
+.normal-reader-pages em,
+.normal-reader-pages i {
+    font-style: italic;
+}
+
+.normal-reader-pages blockquote {
+    margin: 1em 0;
+    padding-left: 1em;
+    border-left: 3px solid var(--accent);
+    color: var(--text-secondary);
+}
+
+.normal-reader-pages ul,
+.normal-reader-pages ol {
+    margin: 0.5em 0;
+    padding-left: 2em;
+}
+
+.normal-reader-pages li {
+    margin-bottom: 0.3em;
+}
+
+.normal-reader-pages img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 0.5em 0;
+}
+
+.normal-reader-pages a {
+    color: var(--accent-light);
+    text-decoration: none;
+}
+
+.normal-reader-pages .chapter-content {
+    break-before: column;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.normal-reader-pages .chapter-content:first-child {
+    break-before: auto;
+}
+
+.normal-reader-pages span[data-word-index] {
+    /* No special styling — invisible annotation */
+}
+
+.page-indicator {
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.floating-rsvp-btn {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.floating-rsvp-btn:active {
+    background: var(--accent-light);
+}
+
+/* Settings section titles */
+.settings-section-title {
+    font-size: 14px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    margin-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Font toggle buttons */
+.font-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.font-toggle-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.font-toggle-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+/* Search input */
+.search-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 16px;
+    margin-bottom: 12px;
+    outline: none;
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Search result items */
+.search-result-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: background 0.2s;
+}
+
+.search-result-item:hover,
+.search-result-item:active {
+    background: rgba(255,255,255,0.1);
+}
+
+.search-result-chapter {
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 2px;
+}
+
+.search-result-context {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.search-result-context mark {
+    background: var(--accent);
+    color: white;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* Bookmark items */
+.bookmark-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.bookmark-item:hover,
+.bookmark-item:active {
+    background: rgba(255,255,255,0.1);
+}
+
+.bookmark-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.bookmark-chapter {
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 2px;
+}
+
+.bookmark-preview {
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bookmark-delete {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bookmark-delete:hover {
+    color: var(--accent);
+    background: rgba(255,255,255,0.1);
+}
+
+.bookmarks-empty,
+.search-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+    font-size: 14px;
 }
