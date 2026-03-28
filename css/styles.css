@@ -621,12 +621,14 @@ input[type="range"]::-webkit-slider-thumb {
     flex: 1;
     overflow: hidden;
     position: relative;
+    contain: layout style paint;
 }
 
 .normal-reader-pages {
     height: 100%;
     column-fill: auto;
     transition: transform 0.3s ease;
+    will-change: transform;
     font-family: var(--normal-font-family);
     font-size: var(--normal-font-size);
     line-height: 1.7;

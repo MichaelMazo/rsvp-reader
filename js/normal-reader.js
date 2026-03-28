@@ -138,9 +138,11 @@ const NormalReader = {
 
     goToPage(pageNum) {
         this.currentPage = Math.max(0, Math.min(pageNum, this.totalPages - 1));
-        this.pagesEl.style.transform = `translateX(-${this.currentPage * this.pageWidth}px)`;
+        this.pagesEl.style.transform = `translate3d(-${this.currentPage * this.pageWidth}px, 0, 0)`;
         this.updatePageIndicator();
-        this.savePosition();
+        // Debounce position save to avoid blocking page turns
+        if (this._saveTimeout) clearTimeout(this._saveTimeout);
+        this._saveTimeout = setTimeout(() => this.savePosition(), 300);
     },
 
     nextPage() {
@@ -183,15 +185,30 @@ const NormalReader = {
     },
 
     getVisibleWordIndex() {
-        const viewLeft = this.currentPage * this.pageWidth;
-        const viewRight = viewLeft + this.pageWidth;
-        const spans = this.pagesEl.querySelectorAll('span[data-word-index]');
+        // Use elementFromPoint for O(1) lookup instead of iterating all spans
+        const containerRect = this.containerEl.getBoundingClientRect();
+        // Sample points in the top-left area of the visible page
+        const sampleX = containerRect.left + 30;
+        const samplePoints = [
+            containerRect.top + 30,
+            containerRect.top + 60,
+            containerRect.top + 90,
+            containerRect.top + 120,
+        ];
 
-        for (const span of spans) {
-            const left = span.offsetLeft;
-            if (left >= viewLeft && left < viewRight) {
-                return parseInt(span.dataset.wordIndex);
+        for (const y of samplePoints) {
+            const el = document.elementFromPoint(sampleX, y);
+            if (el) {
+                const wordSpan = el.closest('span[data-word-index]');
+                if (wordSpan) {
+                    return parseInt(wordSpan.dataset.wordIndex);
+                }
             }
+        }
+
+        // Fallback: estimate from page number and total words
+        if (this.words.length > 0 && this.totalPages > 0) {
+            return Math.floor((this.currentPage / this.totalPages) * this.words.length);
         }
         return 0;
     },
