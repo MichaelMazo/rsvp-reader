@@ -329,24 +329,24 @@ const NormalReader = {
         if (this.contentEl.style.display === 'none') return;
         const selection = window.getSelection();
         if (!selection || selection.isCollapsed || !selection.toString().trim()) {
-            this.floatingRsvpBtn.style.display = 'none';
+            this.hideRsvpBtn();
             return;
         }
         const anchorNode = selection.anchorNode;
         if (!this.pagesEl.contains(anchorNode)) {
-            this.floatingRsvpBtn.style.display = 'none';
+            this.hideRsvpBtn();
             return;
         }
         const wordSpan = anchorNode.nodeType === Node.TEXT_NODE
             ? anchorNode.parentElement.closest('span[data-word-index]')
             : anchorNode.closest('span[data-word-index]');
         if (!wordSpan) {
-            this.floatingRsvpBtn.style.display = 'none';
+            this.hideRsvpBtn();
             return;
         }
-        this.floatingRsvpBtn.style.display = 'flex';
+        this.floatingRsvpBtn.style.cssText = 'display:flex';
         this.floatingRsvpBtn.dataset.wordIndex = wordSpan.dataset.wordIndex;
-        this.floatingRsvpBtn.textContent = `RSVP \u25B6 "${wordSpan.textContent}"`;
+        this.floatingRsvpBtn.textContent = `RSVP \u25B6 \u201C${wordSpan.textContent}\u201D`;
     },
 
     highlightWord(wordIndex) {
@@ -366,9 +366,13 @@ const NormalReader = {
         if (el) el.classList.remove('highlighted-word');
     },
 
+    hideRsvpBtn() {
+        this.floatingRsvpBtn.style.cssText = 'display:none';
+    },
+
     startRsvpFromSelection() {
         const wordIndex = parseInt(this.floatingRsvpBtn.dataset.wordIndex);
-        this.floatingRsvpBtn.style.display = 'none';
+        this.hideRsvpBtn();
         window.getSelection().removeAllRanges();
         App.switchMode('rsvp', wordIndex);
     },
@@ -408,7 +412,7 @@ const NormalReader = {
 
     hide() {
         this.contentEl.style.display = 'none';
-        this.floatingRsvpBtn.style.display = 'none';
+        this.hideRsvpBtn();
     },
 
     reset() {
@@ -422,6 +426,6 @@ const NormalReader = {
         this.totalPages = 1;
         this.chapterPageOffsets = [];
         this.pagesEl.innerHTML = '';
-        this.floatingRsvpBtn.style.display = 'none';
+        this.hideRsvpBtn();
     }
 };
