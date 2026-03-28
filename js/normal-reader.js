@@ -344,13 +344,9 @@ const NormalReader = {
             this.floatingRsvpBtn.style.display = 'none';
             return;
         }
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        const containerRect = this.contentEl.getBoundingClientRect();
         this.floatingRsvpBtn.style.display = 'flex';
-        this.floatingRsvpBtn.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
-        this.floatingRsvpBtn.style.top = `${rect.top - containerRect.top - 40}px`;
         this.floatingRsvpBtn.dataset.wordIndex = wordSpan.dataset.wordIndex;
+        this.floatingRsvpBtn.textContent = `RSVP \u25B6 "${wordSpan.textContent}"`;
     },
 
     highlightWord(wordIndex) {
