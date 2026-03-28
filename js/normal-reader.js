@@ -146,7 +146,7 @@ const NormalReader = {
         void this.pagesEl.offsetHeight;
 
         const scrollWidth = this.pagesEl.scrollWidth;
-        this.totalPagesInChapter = Math.max(1, Math.round(scrollWidth / this.pageWidth));
+        this.totalPagesInChapter = Math.max(1, Math.ceil(scrollWidth / this.pageWidth));
 
         // Update global page count with precise value for current chapter
         this.chapterPageOffsets[this.currentChapterIndex] =
