@@ -211,34 +211,21 @@ const NormalReader = {
     },
 
     _goToWordInCurrentChapter(wordIndex) {
-        // Try exact match first
         const span = this.pagesEl.querySelector(`span[data-word-index="${wordIndex}"]`);
         if (span) {
             const page = Math.floor(span.offsetLeft / this.pageWidth);
             this.goToPage(page);
-            return;
-        }
-
-        // Try nearby indices (word counts can differ slightly between parser modes)
-        for (let delta = 1; delta < 100; delta++) {
-            const s = this.pagesEl.querySelector(`span[data-word-index="${wordIndex + delta}"]`) ||
-                      this.pagesEl.querySelector(`span[data-word-index="${wordIndex - delta}"]`);
-            if (s) {
-                const page = Math.floor(s.offsetLeft / this.pageWidth);
-                this.goToPage(page);
-                return;
-            }
-        }
-
-        // Fallback: proportional position within chapter
-        const ch = this.chaptersHTML[this.currentChapterIndex];
-        if (ch && this.totalPagesInChapter > 1) {
-            const chapterWordCount = ch.endWordIndex - ch.startWordIndex + 1;
-            const posInChapter = wordIndex - ch.startWordIndex;
-            const frac = Math.max(0, Math.min(1, posInChapter / chapterWordCount));
-            const page = Math.floor(frac * this.totalPagesInChapter);
-            this.goToPage(page);
         } else {
+            // Clamp to chapter bounds
+            const ch = this.chaptersHTML[this.currentChapterIndex];
+            if (ch) {
+                const clamped = Math.max(ch.startWordIndex, Math.min(ch.endWordIndex, wordIndex));
+                const s = this.pagesEl.querySelector(`span[data-word-index="${clamped}"]`);
+                if (s) {
+                    this.goToPage(Math.floor(s.offsetLeft / this.pageWidth));
+                    return;
+                }
+            }
             this.goToPage(0);
         }
     },

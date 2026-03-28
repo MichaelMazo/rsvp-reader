@@ -87,14 +87,14 @@ const EpubParser = {
 
             try {
                 const doc = await book.load(item.href);
-                const text = this.extractTextFromDocument(doc);
-                const chapterWords = this.splitIntoWords(text);
-
-                // Extract annotated HTML for normal reading mode
                 const startWordIndex = words.length;
-                const doc2 = await book.load(item.href);
-                const htmlResult = this.extractHTMLWithWordIndices(doc2, startWordIndex);
 
+                // Single source of truth: HTML walker extracts both
+                // annotated HTML and the words array
+                const htmlResult = this.extractHTMLWithWordIndices(doc, startWordIndex);
+
+                // Build words array from the same walker output
+                const chapterWords = htmlResult.words;
                 words.push(...chapterWords);
 
                 chaptersHTML.push({
@@ -104,11 +104,6 @@ const EpubParser = {
                     startWordIndex: startWordIndex,
                     endWordIndex: words.length - 1
                 });
-
-                // Verify word count consistency
-                if (htmlResult.wordCount !== chapterWords.length) {
-                    console.warn(`Word count mismatch in ${item.href}: splitIntoWords=${chapterWords.length}, HTML=${htmlResult.wordCount}`);
-                }
             } catch (e) {
                 console.warn('Failed to load chapter:', item.href, e);
             }
@@ -228,7 +223,7 @@ const EpubParser = {
         }
 
         const body = doc.body || doc.documentElement;
-        if (!body) return { html: '', wordCount: 0 };
+        if (!body) return { html: '', wordCount: 0, words: [] };
 
         // Remove script and style elements
         body.querySelectorAll('script, style').forEach(el => el.remove());
@@ -246,6 +241,7 @@ const EpubParser = {
         ]);
 
         let wordIndex = startIndex;
+        const collectedWords = [];
 
         // Process a text node: split into words using same logic as splitIntoWords,
         // wrap each word in <span data-word-index="N">
@@ -280,6 +276,7 @@ const EpubParser = {
                     span.setAttribute('data-word-index', wordIndex);
                     span.textContent = part;
                     fragment.appendChild(span);
+                    collectedWords.push(part);
                     wordIndex++;
                 } else {
                     fragment.appendChild(textNode.ownerDocument.createTextNode(part));
@@ -337,7 +334,8 @@ const EpubParser = {
 
         return {
             html: body.innerHTML,
-            wordCount: wordIndex - startIndex
+            wordCount: wordIndex - startIndex,
+            words: collectedWords
         };
     },
 
