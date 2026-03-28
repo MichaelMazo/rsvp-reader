@@ -45,7 +45,13 @@ const NormalReader = {
         this.containerEl.addEventListener('click', (e) => this.onContainerClick(e));
 
         document.addEventListener('selectionchange', () => this.onSelectionChange());
-        this.floatingRsvpBtn.addEventListener('click', (e) => {
+        this.floatingRsvpBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent selection from being cleared
+            e.stopPropagation();
+            this.startRsvpFromSelection();
+        });
+        this.floatingRsvpBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             this.startRsvpFromSelection();
         });
